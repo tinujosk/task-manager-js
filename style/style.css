@@ -1,0 +1,9 @@
+.flex-container {
+  display: flex;
+  justify-content: space-between;
+}
+
+.flex-container #task-list,
+.flex-container #task-form {
+  width: 45%;
+}

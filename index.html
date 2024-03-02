@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Manager</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/css/materialize.min.css"
+    />
+    <link rel="stylesheet" href="./style/style.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h3>Task Manager</h3>
+      <div class="flex-container">
+        <div id="task-list"></div>
+        <form id="task-form">
+          <div class="input-field">
+            <input type="text" id="task-name" name="taskName" required />
+            <label for="task-name">Task Name</label>
+          </div>
+          <div class="input-field">
+            <input type="text" id="assignee" name="assignee" required />
+            <label for="assignee">Assignee</label>
+          </div>
+          <div class="input-field">
+            <textarea
+              id="description"
+              class="materialize-textarea"
+              name="description"
+            ></textarea>
+            <label for="description">Description</label>
+          </div>
+          <div class="input-field">
+            <input
+              type="text"
+              id="due-date"
+              class="datepicker"
+              name="dueDate"
+              required
+            />
+            <label for="due-date">Due Date</label>
+          </div>
+          <div class="input-field">
+            <select id="priority" name="priority" required>
+              <option value="" disabled selected>Choose Priority</option>
+              <option value="low">Low</option>
+              <option value="medium">Medium</option>
+              <option value="high">High</option>
+            </select>
+            <label>Priority</label>
+          </div>
+          <button class="btn waves-effect waves-light" type="submit">
+            Add Task
+          </button>
+        </form>
+      </div>
+    </div>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0/js/materialize.min.js"></script>
+    <script src="./js/task.js"></script>
+  </body>
+</html>
