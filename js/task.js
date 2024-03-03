@@ -1,6 +1,7 @@
 let editMode = false;
 let editTaskId = null;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+const tasksInStorage = [];
 
 // Render tasks on page load
 document.addEventListener('DOMContentLoaded', () => {
@@ -74,7 +75,6 @@ const createTaskCard = task => {
       const taskId = this.getAttribute('data-task-id');
       let tasks = JSON.parse(localStorage.getItem('tasks'));
       tasks = tasks.filter(task => task.id !== parseInt(taskId));
-      console.log('tasks', tasks);
       localStorage.setItem('tasks', JSON.stringify(tasks));
       $('#modal-prompt').modal('close');
       renderTasks();
@@ -90,10 +90,9 @@ const createTaskCard = task => {
 };
 
 // Function to render all tasks
-renderTasks = () => {
+renderTasks = (addMode, filteredTasks) => {
   $('#task-list').text('');
-  const tasks = JSON.parse(localStorage.getItem('tasks'));
-  console.log('check legth', tasks);
+  const tasks = filteredTasks || JSON.parse(localStorage.getItem('tasks'));
   if (!tasks || !tasks.length) {
     $('#task-list').html(`<div class="no-task"><p>No tasks found.<br>
     Please start adding your tasks</p>
@@ -104,7 +103,7 @@ renderTasks = () => {
     tasks.forEach((task, index) => {
       const card = createTaskCard(task);
       $('#task-list').append(card);
-      if (index === 0) {
+      if (addMode && index === 0) {
         card.classList.add('fade-in');
       }
     });
@@ -138,8 +137,7 @@ const addTask = taskValues => {
   M.toast({
     html: 'Task added successfully!',
     classes: 'green',
-    displayBottom: true,
-  }); // Show toast message
+  });
 
   $('#task-form')[0].reset();
   renderTasks();
@@ -173,8 +171,7 @@ const editTask = (taskValues, editTaskId) => {
   M.toast({
     html: 'Task Edited successfully!',
     classes: 'green',
-    displayBottom: true,
-  }); // Show toast message
+  });
 
   $('#task-form')[0].reset();
   editMode = false;
@@ -187,6 +184,18 @@ $('#cancelEdit').click(e => {
   editMode = false;
   changeEditStyles(editMode);
   $('#task-form')[0].reset();
+});
+
+$('#search').keypress(function () {
+  const searchText = this.value.toLowerCase();
+  let tasks = JSON.parse(localStorage.getItem('tasks'));
+  const filteredTasks = tasks.filter(task =>
+    Object.values(task).some(
+      value =>
+        typeof value === 'string' && value.toLowerCase().includes(searchText)
+    )
+  );
+  renderTasks(false, filteredTasks);
 });
 
 $('#task-form').submit(e => {
@@ -215,9 +224,8 @@ $('#task-form').submit(e => {
     }
   } else {
     M.toast({
-      html: 'Please add all mandatory fields! Also ensure date format',
+      html: 'Please add all fields and ensure date format',
       classes: 'red',
-      displayBottom: true,
-    }); // Show toast message
+    });
   }
 });

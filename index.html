@@ -19,53 +19,65 @@
       <h3>Task Manager</h3>
       <div class="flex-container">
         <div id="task-list"></div>
-        <form id="task-form">
-          <span class="editModeLabel">EDIT MODE</span>
-          <div class="input-field">
-            <input type="text" id="task-name" name="taskName" />
-            <label for="task-name">Task Name</label>
+        <div id="task-forms">
+          <div>
+            <h5>Search Tasks</h5>
+            <div class="input-field">
+              <input id="search" type="text" class="validate" />
+              <label for="search"
+                >Enter any task details here.. (eg. name, assignee etc)</label
+              >
+            </div>
           </div>
-          <div class="input-field">
-            <input type="text" id="assignee" name="assignee" />
-            <label for="assignee">Assignee</label>
-          </div>
-          <div class="input-field">
-            <textarea
-              id="description"
-              class="materialize-textarea"
-              name="description"
-            ></textarea>
-            <label for="description">Description</label>
-          </div>
-          <div class="input-field">
-            <input
-              type="text"
-              id="due-date"
-              class="datepicker"
-              name="dueDate"
-            />
-            <label for="due-date">Due Date</label>
-          </div>
-          <div class="input-field">
-            <select id="priority" name="priority">
-              <option value="" disabled selected>Choose Priority</option>
-              <option value="low">Low</option>
-              <option value="medium">Medium</option>
-              <option value="high">High</option>
-            </select>
-            <label>Priority</label>
-          </div>
-          <button
-            id="addEditBtn"
-            class="btn waves-effect waves-light"
-            type="submit"
-          >
-            Add Task
-          </button>
-          <button id="cancelEdit" class="btn waves-effect waves-light orange">
-            Cancel Edit
-          </button>
-        </form>
+          <h5>Add/Edit Tasks</h5>
+          <form id="task-form">
+            <span class="editModeLabel">EDIT MODE</span>
+            <div class="input-field">
+              <input type="text" id="task-name" name="taskName" />
+              <label for="task-name">Task Name</label>
+            </div>
+            <div class="input-field">
+              <input type="text" id="assignee" name="assignee" />
+              <label for="assignee">Assignee</label>
+            </div>
+            <div class="input-field">
+              <textarea
+                id="description"
+                class="materialize-textarea"
+                name="description"
+              ></textarea>
+              <label for="description">Description</label>
+            </div>
+            <div class="input-field">
+              <input
+                type="text"
+                id="due-date"
+                class="datepicker"
+                name="dueDate"
+              />
+              <label for="due-date">Due Date</label>
+            </div>
+            <div class="input-field">
+              <select id="priority" name="priority">
+                <option value="" disabled selected>Choose Priority</option>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+              </select>
+              <label>Priority</label>
+            </div>
+            <button
+              id="addEditBtn"
+              class="btn waves-effect waves-light"
+              type="submit"
+            >
+              Add Task
+            </button>
+            <button id="cancelEdit" class="btn waves-effect waves-light orange">
+              Cancel Edit
+            </button>
+          </form>
+        </div>
       </div>
       <div class="scroll-more">Scroll to see more tasks</div>
     </div>

@@ -5,15 +5,15 @@
 }
 
 .flex-container #task-list,
-.flex-container #task-form {
+.flex-container #task-forms {
   width: 45%;
-  padding: 10px;
 }
 
 .flex-container #task-form {
   border: none;
   border-radius: 5px;
-  max-height: fit-content;
+  max-height: 450px;
+  padding: 10px;
 }
 
 .flex-container #task-list {
