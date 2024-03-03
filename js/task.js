@@ -1,10 +1,11 @@
 let editMode = false;
 let editTaskId = null;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-const tasksInStorage = [];
+let tasksInStorage = [];
 
-// Render tasks on page load
+// Intialise few components, read from local storage and do initial render on document load.
 document.addEventListener('DOMContentLoaded', () => {
+  tasksInStorage = JSON.parse(localStorage.getItem('tasks')) || [];
   renderTasks();
   M.Datepicker.init($('.datepicker'), {
     format: 'yyyy-mm-dd',
@@ -29,6 +30,7 @@ const getColorClass = priority => {
 
 // Function to create a card for each task
 const createTaskCard = task => {
+  // The card is created dymically
   const card = document.createElement('div');
   card.innerHTML = `
   <div class="col">
@@ -51,11 +53,13 @@ const createTaskCard = task => {
   const deleteIcon = card.querySelector('.delete-icon');
   const editIcon = card.querySelector('.edit-icon');
 
+  // Adding event listener for edit click
   editIcon.addEventListener('click', function () {
-    let tasks = JSON.parse(localStorage.getItem('tasks'));
     const taskId = this.getAttribute('data-task-id');
-    const task = tasks.find(task => task.id === parseInt(taskId));
+    // Find the task which is clicked and fill those details in the form for editing
+    const task = tasksInStorage.find(task => task.id === parseInt(taskId));
     if (task) {
+      // Switch to edit mode and store the edit task id, and change the edit styles.
       editMode = true;
       editTaskId = task.id;
       changeEditStyles(editMode);
@@ -68,16 +72,22 @@ const createTaskCard = task => {
     }
   });
 
+  // Adding event listener for delete click
   deleteIcon.addEventListener('click', function () {
+    // Open a confirmation modal for delete
     $('.modal').modal();
     $('#modal-prompt').modal('open');
     $('#confirm-delete').click(() => {
+      // Filter out remaining task to delete the clicked task, and update global task array and localStorage
       const taskId = this.getAttribute('data-task-id');
-      let tasks = JSON.parse(localStorage.getItem('tasks'));
-      tasks = tasks.filter(task => task.id !== parseInt(taskId));
-      localStorage.setItem('tasks', JSON.stringify(tasks));
+      tasksInStorage = tasksInStorage.filter(
+        task => task.id !== parseInt(taskId)
+      );
+      localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
       $('#modal-prompt').modal('close');
+      // Re render tasks
       renderTasks();
+      // Show a toast
       M.toast({
         html: 'Task deleted!',
         classes: 'red',
@@ -92,14 +102,26 @@ const createTaskCard = task => {
 // Function to render all tasks
 renderTasks = (addMode, filteredTasks) => {
   $('#task-list').text('');
-  const tasks = filteredTasks || JSON.parse(localStorage.getItem('tasks'));
-  if (!tasks || !tasks.length) {
-    $('#task-list').html(`<div class="no-task"><p>No tasks found.<br>
-    Please start adding your tasks</p>
-    <i class="material-icons no-task-icon">checklist</i>
-    <div>`);
+  // If there is filteredTasks (incase of search), show that, else show the tasks from the localStorage
+  const tasks = filteredTasks || tasksInStorage;
+  if (!tasks.length) {
+    let notFoundText;
+    // Check which message to display, if it's a search mode and no task found, show that message, else
+    // show the other message when no task is available at all.
+    if ($('#search').val() !== '') {
+      notFoundText = `<div class="no-task"><p>Search not found.<br>
+      Refine your search</p>
+      <i class="material-icons no-task-icon">manage_search</i>
+      <div>`;
+    } else {
+      notFoundText = `<div class="no-task"><p>No tasks found.<br>
+      Please start adding your tasks</p>
+      <i class="material-icons no-task-icon">checklist</i>
+      <div>`;
+    }
+    $('#task-list').html(notFoundText);
   } else {
-    tasks.reverse();
+    // If there are tasks, then create task cards.
     tasks.forEach((task, index) => {
       const card = createTaskCard(task);
       $('#task-list').append(card);
@@ -108,19 +130,18 @@ renderTasks = (addMode, filteredTasks) => {
       }
     });
   }
+  // Show a "scroll to see more text" at the bottom when there are 4 or more cards.
   $('.scroll-more').css({
     display: tasks && tasks.length >= 4 ? 'block' : 'none',
   });
 };
 
+// Function to add new tasks.
 const addTask = taskValues => {
   const { taskName, assignee, dueDate, description, priority } = taskValues;
-  // Get tasks from localStorage
-  let tasks = localStorage.getItem('tasks');
-  tasks = tasks ? JSON.parse(tasks) : [];
-  const lastTaskId = tasks[tasks.length - 1]?.id || 0;
+  const lastTaskId = tasksInStorage[tasksInStorage.length - 1]?.id || 0;
 
-  // Create task object
+  // Create task object, we also generate a unique ID, on adding each task based on last item id.
   const task = {
     id: lastTaskId + 1,
     taskName,
@@ -130,66 +151,72 @@ const addTask = taskValues => {
     priority,
   };
 
-  // Add new task
-  tasks.push(task);
-  localStorage.setItem('tasks', JSON.stringify(tasks));
+  // Add new task to the beginning of the array in order to display it on top, and update localStorage
+  tasksInStorage.unshift(task);
+  localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
 
+  // Show toast
   M.toast({
     html: 'Task added successfully!',
     classes: 'green',
   });
 
+  // Reset the form and render the new data.
   $('#task-form')[0].reset();
-  renderTasks();
+  renderTasks(true);
 };
 
+// Change the edit mode styles based on editMode flag
 const changeEditStyles = editMode => {
   if (editMode) {
-    $('#addEditBtn').text('Save Edit');
-    $('#cancelEdit').show();
+    $('#add-edit-btn').text('Save Edit');
+    $('#cancel-edit').show();
     $('#task-form').css({ border: '1px solid red' });
-    $('.editModeLabel').show();
+    $('.editmode-label').show();
   } else {
-    $('#addEditBtn').text('Add Task');
-    $('#cancelEdit').hide();
+    $('#add-edit-btn').text('Add Task');
+    $('#cancel-edit').hide();
     $('#task-form').css({ border: 'none' });
-    $('.editModeLabel').hide();
+    $('.editmode-label').hide();
   }
 };
 
+// Function to edit a task
 const editTask = (taskValues, editTaskId) => {
-  let tasks = localStorage.getItem('tasks');
-  tasks = tasks ? JSON.parse(tasks) : [];
-
-  const updatedTasks = tasks.map(task => {
+  // Find the task, apply new values, and store it in localStorage.
+  tasksInStorage = tasksInStorage.map(task => {
     if (task.id === editTaskId) {
       return { id: editTaskId, ...taskValues };
     }
     return task;
   });
-  localStorage.setItem('tasks', JSON.stringify(updatedTasks));
+  localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
+
+  // Show toast.
   M.toast({
     html: 'Task Edited successfully!',
     classes: 'green',
   });
 
+  // Reset form, disable editMode and its styles, and re-render.
   $('#task-form')[0].reset();
   editMode = false;
   changeEditStyles(editMode);
   renderTasks();
 };
 
-$('#cancelEdit').click(e => {
+// Cancel the edit mode on Cancel Edit click
+$('#cancel-edit').click(e => {
   e.preventDefault();
   editMode = false;
   changeEditStyles(editMode);
   $('#task-form')[0].reset();
 });
 
-$('#search').keypress(function () {
-  const searchText = this.value.toLowerCase();
-  let tasks = JSON.parse(localStorage.getItem('tasks'));
-  const filteredTasks = tasks.filter(task =>
+// Search for any task detail and display those cards on each keypress.
+$('#search').on('input', function () {
+  const searchText = this.value.trim().toLowerCase();
+  const filteredTasks = tasksInStorage.filter(task =>
     Object.values(task).some(
       value =>
         typeof value === 'string' && value.toLowerCase().includes(searchText)
@@ -198,16 +225,18 @@ $('#search').keypress(function () {
   renderTasks(false, filteredTasks);
 });
 
+// Function to submit the task form
 $('#task-form').submit(e => {
   e.preventDefault();
 
-  // Get form values
+  // Read all values.
   const taskName = $('#task-name').val();
   const assignee = $('#assignee').val();
   const description = $('#description').val();
   const dueDate = $('#due-date').val();
   const priority = M.FormSelect.getInstance($('#priority')).input.value;
 
+  // Do the validation for every input
   if (
     taskName !== '' &&
     assignee !== '' &&
@@ -217,12 +246,14 @@ $('#task-form').submit(e => {
     priority !== 'Choose Priority'
   ) {
     const taskData = { taskName, assignee, description, dueDate, priority };
+    // Call add task or edit task based on editMode flag.
     if (editMode) {
       editTask(taskData, editTaskId);
     } else {
       addTask(taskData);
     }
   } else {
+    // Else display an error message.
     M.toast({
       html: 'Please add all fields and ensure date format',
       classes: 'red',

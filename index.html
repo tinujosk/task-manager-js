@@ -20,7 +20,7 @@
       <div class="flex-container">
         <div id="task-list"></div>
         <div id="task-forms">
-          <div>
+          <div class="search-container">
             <h5>Search Tasks</h5>
             <div class="input-field">
               <input id="search" type="text" class="validate" />
@@ -29,7 +29,7 @@
               >
             </div>
           </div>
-          <h5>Add/Edit Tasks</h5>
+          <h5>Add and Edit Tasks</h5>
           <form id="task-form">
             <span class="editModeLabel">EDIT MODE</span>
             <div class="input-field">
@@ -67,13 +67,16 @@
               <label>Priority</label>
             </div>
             <button
-              id="addEditBtn"
+              id="add-edit-btn"
               class="btn waves-effect waves-light"
               type="submit"
             >
               Add Task
             </button>
-            <button id="cancelEdit" class="btn waves-effect waves-light orange">
+            <button
+              id="cancel-edit"
+              class="btn waves-effect waves-light orange"
+            >
               Cancel Edit
             </button>
           </form>
@@ -81,7 +84,6 @@
       </div>
       <div class="scroll-more">Scroll to see more tasks</div>
     </div>
-    <!-- Modal Structure -->
     <div id="modal-prompt" class="modal">
       <div class="modal-content">
         <h4>Are you sure to delete this task?</h4>

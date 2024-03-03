@@ -21,6 +21,10 @@
   max-height: 650px;
 }
 
+.search-container {
+  margin-bottom: 40px;
+}
+
 .card .card-title,
 .card .card-content {
   padding: 10px;
@@ -62,7 +66,7 @@
   cursor: pointer;
 }
 
-.editModeLabel {
+.editmode-label {
   background-color: red;
   padding: 3px;
   color: #fff;
@@ -71,11 +75,10 @@
   display: none;
 }
 
-#cancelEdit {
+#cancel-edit {
   display: none;
 }
 
-/* Define CSS animation */
 @keyframes fadeIn {
   from {
     opacity: 0;
