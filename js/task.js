@@ -34,19 +34,21 @@ const createTaskCard = task => {
   const card = document.createElement('div');
   card.innerHTML = `
   <div class="col">
-  <div class="card ${getColorClass(task.priority)} white-text">
-  <div class="card-title">
-  ${task.taskName}
-  <i class="material-icons delete-icon" data-task-id="${task.id}">delete</i>
-  <i class="material-icons edit-icon" data-task-id="${task.id}">edit</i>
-  </div>
-  <div class="card-content">
+    <div class="card ${getColorClass(task.priority)} white-text">
+      <div class="card-title">
+        ${task.taskName}
+        <i class="material-icons delete-icon" data-task-id="${
+          task.id
+        }">delete</i>
+        <i class="material-icons edit-icon" data-task-id="${task.id}">edit</i>
+      </div>
+      <div class="card-content">
         <p><strong>Assignee:</strong> ${task.assignee}</p>
         <p><strong>Description:</strong> ${task.description}</p>
         <p><strong>Due Date:</strong> ${task.dueDate}</p>
         <p><strong>Priority:</strong> ${task.priority}</p>
-  </div>
-  </div>
+      </div>
+    </div>
   </div>
     `;
 
@@ -108,12 +110,16 @@ renderTasks = (showFadeIn = false, tasks = tasksInStorage) => {
     // Check which message to display, if it's a search mode and no task found, show that message, else
     // show the other message when no task is available at all.
     if ($('#search').val() !== '') {
-      notFoundText = `<div class="no-task"><p>Search not found.<br> Refine your search</p>
-      <i class="material-icons no-task-icon">manage_search</i>
+      notFoundText = `
+      <div class="no-task">
+        <p>Search not found.<br> Refine your search</p>
+        <i class="material-icons no-task-icon">manage_search</i>
       <div>`;
     } else {
-      notFoundText = `<div class="no-task"><p>No tasks found.<br> Please start adding your tasks</p>
-      <i class="material-icons no-task-icon">checklist</i>
+      notFoundText = `
+      <div class="no-task">
+        <p>No tasks found.<br> Please start adding your tasks</p>
+        <i class="material-icons no-task-icon">checklist</i>
       <div>`;
     }
     $('#task-list').html(notFoundText);
