@@ -100,22 +100,19 @@ const createTaskCard = task => {
 };
 
 // Function to render all tasks
-renderTasks = (addMode, filteredTasks) => {
+renderTasks = (showFadeIn = false, tasks = tasksInStorage) => {
   $('#task-list').text('');
-  // If there is filteredTasks (incase of search), show that, else show the tasks from the localStorage
-  const tasks = filteredTasks || tasksInStorage;
+  // Check if the task array is empty or not.
   if (!tasks.length) {
     let notFoundText;
     // Check which message to display, if it's a search mode and no task found, show that message, else
     // show the other message when no task is available at all.
     if ($('#search').val() !== '') {
-      notFoundText = `<div class="no-task"><p>Search not found.<br>
-      Refine your search</p>
+      notFoundText = `<div class="no-task"><p>Search not found.<br> Refine your search</p>
       <i class="material-icons no-task-icon">manage_search</i>
       <div>`;
     } else {
-      notFoundText = `<div class="no-task"><p>No tasks found.<br>
-      Please start adding your tasks</p>
+      notFoundText = `<div class="no-task"><p>No tasks found.<br> Please start adding your tasks</p>
       <i class="material-icons no-task-icon">checklist</i>
       <div>`;
     }
@@ -125,7 +122,7 @@ renderTasks = (addMode, filteredTasks) => {
     tasks.forEach((task, index) => {
       const card = createTaskCard(task);
       $('#task-list').append(card);
-      if (addMode && index === 0) {
+      if (showFadeIn && index === 0) {
         card.classList.add('fade-in');
       }
     });
