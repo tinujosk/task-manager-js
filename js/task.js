@@ -77,9 +77,9 @@ const createTaskCard = task => {
     // Open a confirmation modal for delete
     $('.modal').modal();
     $('#modal-prompt').modal('open');
-    $('#confirm-delete').click(() => {
+    $('#confirm-delete').click(function () {
       // Filter out remaining task to delete the clicked task, and update global task array and localStorage
-      const taskId = this.getAttribute('data-task-id');
+      const taskId = deleteIcon.getAttribute('data-task-id');
       tasksInStorage = tasksInStorage.filter(
         task => task.id !== parseInt(taskId)
       );
@@ -139,11 +139,12 @@ renderTasks = (addMode, filteredTasks) => {
 // Function to add new tasks.
 const addTask = taskValues => {
   const { taskName, assignee, dueDate, description, priority } = taskValues;
-  const lastTaskId = tasksInStorage[tasksInStorage.length - 1]?.id || 0;
+  // const lastTaskId = tasksInStorage[tasksInStorage.length - 1]?.id || 0;
+  const id = tasksInStorage.length === 0 ? 1 : tasksInStorage[0]?.id + 1;
 
   // Create task object, we also generate a unique ID, on adding each task based on last item id.
   const task = {
-    id: lastTaskId + 1,
+    id,
     taskName,
     assignee,
     description,
