@@ -1,3 +1,11 @@
+/*
+Authors
+1. Alex Jo Abraham - 8912704
+2. Venetia Faber - 8918972
+3. Tinu Jos Kadavanattu - 8927158
+*/
+
+//Intialize few variables and constants
 let editMode = false;
 let editTaskId = null;
 const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
@@ -15,6 +23,7 @@ $(() => {
 });
 
 // Add delegated event listener on delete-icon click
+// Event is delegated because each task card is created dynamically, so the listeners might not work if not delegated
 $('#task-list').on('click', '.delete-icon', function () {
   const taskId = $(this).attr('data-task-id');
   // Open a confirmation modal for delete
