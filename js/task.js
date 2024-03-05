@@ -4,7 +4,7 @@ const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
 let tasksInStorage = [];
 
 // Intialise few components, read from local storage and do initial render on document load.
-document.addEventListener('DOMContentLoaded', () => {
+$(() => {
   tasksInStorage = JSON.parse(localStorage.getItem('tasks')) || [];
   renderTasks();
   M.Datepicker.init($('.datepicker'), {
@@ -12,6 +12,49 @@ document.addEventListener('DOMContentLoaded', () => {
     autoClose: true,
   });
   M.FormSelect.init($('select'), {});
+});
+
+// Add delegated event listener on delete-icon click
+$('#task-list').on('click', '.delete-icon', function () {
+  const taskId = $(this).attr('data-task-id');
+  // Open a confirmation modal for delete
+  $('.modal').modal();
+  $('#modal-prompt').modal('open');
+  $('#confirm-delete').one('click', () => {
+    // Filter out remaining task to delete the clicked task, and update global task array and localStorage
+    tasksInStorage = tasksInStorage.filter(
+      task => task.id !== parseInt(taskId)
+    );
+    localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
+    $('#modal-prompt').modal('close');
+    // Re render tasks
+    renderTasks();
+    // Show a toast
+    M.toast({
+      html: 'Task deleted!',
+      classes: 'red',
+      displayBottom: true,
+    });
+  });
+});
+
+// Add delegated event listener on edit-icon click
+$('#task-list').on('click', '.edit-icon', function () {
+  const taskId = $(this).attr('data-task-id');
+  // Find the task which is clicked and fill those details in the form for editing
+  const task = tasksInStorage.find(task => task.id === parseInt(taskId));
+  if (task) {
+    // Switch to edit mode and store the edit task id, and change the edit styles.
+    editMode = true;
+    editTaskId = task.id;
+    changeEditStyles(editMode);
+    $('#task-name').val(task.taskName);
+    $('#assignee').val(task.assignee);
+    $('#description').val(task.description);
+    $('#due-date').val(task.dueDate);
+    M.FormSelect.getInstance($('#priority')).input.value = task.priority;
+    $('.input-field label:not(:last)').addClass('active');
+  }
 });
 
 // Function to get color class based on priority
@@ -51,52 +94,6 @@ const createTaskCard = task => {
     </div>
   </div>
     `;
-
-  const deleteIcon = card.querySelector('.delete-icon');
-  const editIcon = card.querySelector('.edit-icon');
-
-  // Adding event listener for edit click
-  editIcon.addEventListener('click', function () {
-    const taskId = this.getAttribute('data-task-id');
-    // Find the task which is clicked and fill those details in the form for editing
-    const task = tasksInStorage.find(task => task.id === parseInt(taskId));
-    if (task) {
-      // Switch to edit mode and store the edit task id, and change the edit styles.
-      editMode = true;
-      editTaskId = task.id;
-      changeEditStyles(editMode);
-      $('#task-name').val(task.taskName);
-      $('#assignee').val(task.assignee);
-      $('#description').val(task.description);
-      $('#due-date').val(task.dueDate);
-      M.FormSelect.getInstance($('#priority')).input.value = task.priority;
-      $('.input-field label:not(:last)').addClass('active');
-    }
-  });
-
-  // Adding event listener for delete click
-  deleteIcon.addEventListener('click', function () {
-    // Open a confirmation modal for delete
-    $('.modal').modal();
-    $('#modal-prompt').modal('open');
-    $('#confirm-delete').click(function () {
-      // Filter out remaining task to delete the clicked task, and update global task array and localStorage
-      const taskId = deleteIcon.getAttribute('data-task-id');
-      tasksInStorage = tasksInStorage.filter(
-        task => task.id !== parseInt(taskId)
-      );
-      localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
-      $('#modal-prompt').modal('close');
-      // Re render tasks
-      renderTasks();
-      // Show a toast
-      M.toast({
-        html: 'Task deleted!',
-        classes: 'red',
-        displayBottom: true,
-      });
-    });
-  });
 
   return card;
 };
@@ -142,9 +139,7 @@ renderTasks = (showFadeIn = false, tasks = tasksInStorage) => {
 // Function to add new tasks.
 const addTask = taskValues => {
   const { taskName, assignee, dueDate, description, priority } = taskValues;
-  // const lastTaskId = tasksInStorage[tasksInStorage.length - 1]?.id || 0;
   const id = tasksInStorage.length === 0 ? 1 : tasksInStorage[0]?.id + 1;
-
   // Create task object, we also generate a unique ID, on adding each task based on last item id.
   const task = {
     id,
