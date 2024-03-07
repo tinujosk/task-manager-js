@@ -13,7 +13,8 @@ let tasksInStorage = [];
 
 // Intialise few components, read from local storage and do initial render on document load.
 $(() => {
-  tasksInStorage = JSON.parse(localStorage.getItem('tasks')) || [];
+  // tasksLStorage is a unique name given inorder to avoid any key name clashes alrady present in the users browser
+  tasksInStorage = JSON.parse(localStorage.getItem('tasksLStorage')) || [];
   renderTasks();
   M.Datepicker.init($('.datepicker'), {
     format: 'yyyy-mm-dd',
@@ -34,7 +35,7 @@ $('#task-list').on('click', '.delete-icon', function () {
     tasksInStorage = tasksInStorage.filter(
       task => task.id !== parseInt(taskId)
     );
-    localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
+    localStorage.setItem('tasksLStorage', JSON.stringify(tasksInStorage));
     $('#modal-prompt').modal('close');
     // Re render tasks
     renderTasks();
@@ -161,7 +162,7 @@ const addTask = taskValues => {
 
   // Add new task to the beginning of the array in order to display it on top, and update localStorage
   tasksInStorage.unshift(task);
-  localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
+  localStorage.setItem('tasksLStorage', JSON.stringify(tasksInStorage));
 
   // Show toast
   M.toast({
@@ -198,7 +199,7 @@ const editTask = (taskValues, editTaskId) => {
     }
     return task;
   });
-  localStorage.setItem('tasks', JSON.stringify(tasksInStorage));
+  localStorage.setItem('tasksLStorage', JSON.stringify(tasksInStorage));
 
   // Show toast.
   M.toast({
